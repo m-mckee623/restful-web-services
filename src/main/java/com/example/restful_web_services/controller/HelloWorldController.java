@@ -3,6 +3,7 @@ package com.example.restful_web_services.controller;
 
 import com.example.restful_web_services.HelloWorld;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 //Add the Spring annotation, "RestController". Let Spring know this is a controller
@@ -23,5 +24,13 @@ public class HelloWorldController {
     @GetMapping(path = "hello-world-pojo")
     public HelloWorld helloWorldPojo() {
         return new HelloWorld("Hello World, this is my message to the world!");
+    }
+
+    //GET
+    //URI - /hello-world/path-variable/{name}
+    //method - Will return the path variable in the message
+    @GetMapping(path = "hello-world/path-variable/{name}")
+    public HelloWorld helloWorldPathVariable(@PathVariable String name) {
+        return new HelloWorld(String.format("Hello World, %s", name));
     }
 }
