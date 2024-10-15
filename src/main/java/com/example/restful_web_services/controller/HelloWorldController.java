@@ -27,6 +27,8 @@ public class HelloWorldController {
     @GetMapping(path = "hello-world-pojo")
     public HelloWorld helloWorldPojo() {
         return new HelloWorld("Hello World, this is my message to the world!");
+        // Below was to show the error worked.
+       // throw new RuntimeException("Something went wrong");
     }
 
     //GET
