@@ -2,12 +2,15 @@ package com.example.restful_web_services.controller;
 
 
 import com.example.restful_web_services.HelloWorld;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 //Add the Spring annotation, "RestController". Let Spring know this is a controller
 @RestController
+//CORS
+@CrossOrigin(origins="http://localhost:4200")
 public class HelloWorldController {
 
     //GET
