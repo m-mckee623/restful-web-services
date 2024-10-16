@@ -1,4 +1,4 @@
-package com.example.restful_web_services;
+package com.example.restful_web_services.pojo;
 
 public class HelloWorld {
     String message;
