@@ -3,10 +3,8 @@ package com.example.restful_web_services.controller;
 import com.example.restful_web_services.pojo.Todo;
 import com.example.restful_web_services.service.TodoHardcodedService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -18,7 +16,17 @@ public class TodoController {
     private TodoHardcodedService todoHardcodedService;
 
     @GetMapping("/todos")
-    public List<Todo> getAllTodos(){
+    public List<Todo> getAllTodos() {
         return todoHardcodedService.findAllTodos();
+    }
+
+    @DeleteMapping("todos/{id}")
+    public ResponseEntity<Void> deleteTodo(@PathVariable long id){
+        Todo todo = todoHardcodedService.deleteById(id);
+
+        if(todo != null){
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.notFound().build();
     }
 }
