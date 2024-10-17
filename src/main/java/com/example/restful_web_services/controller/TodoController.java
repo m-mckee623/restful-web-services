@@ -3,6 +3,7 @@ package com.example.restful_web_services.controller;
 import com.example.restful_web_services.pojo.Todo;
 import com.example.restful_web_services.service.TodoHardcodedService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,5 +36,13 @@ public class TodoController {
             return ResponseEntity.ok().build();
         }
         return ResponseEntity.notFound().build();
+    }
+
+    //EDIT/UPDATE
+    @PutMapping("/todos/{id}")
+    public ResponseEntity<Todo> updateTodo(@PathVariable long id, @RequestBody Todo todo){
+        Todo todoUpdated = todoHardcodedService.save(todo);
+
+        return new ResponseEntity<Todo>(todo, HttpStatus.OK);
     }
 }
