@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+//TODO: ADD USERNAME AS PATH VARIABLE FOR THE NECESSARY CALLS. First get this all functioning basic.
+
 @RestController
 @CrossOrigin(origins="http://localhost:4200")
 public class TodoController {
@@ -18,6 +20,11 @@ public class TodoController {
     @GetMapping("/todos")
     public List<Todo> getAllTodos() {
         return todoHardcodedService.findAllTodos();
+    }
+
+    @GetMapping("/todos/{id}")
+    public Todo getTodo(@PathVariable long id){
+        return todoHardcodedService.findById(id);
     }
 
     @DeleteMapping("todos/{id}")
