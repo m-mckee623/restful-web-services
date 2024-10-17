@@ -6,7 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 
 //TODO: ADD USERNAME AS PATH VARIABLE FOR THE NECESSARY CALLS. First get this all functioning basic.
@@ -44,5 +46,18 @@ public class TodoController {
         Todo todoUpdated = todoHardcodedService.save(todo);
 
         return new ResponseEntity<Todo>(todo, HttpStatus.OK);
+    }
+
+    //CREATE/NEW
+    @PostMapping("/todos")
+    public ResponseEntity<Todo> createTodo(@RequestBody Todo todo){
+        Todo createdTodo = todoHardcodedService.save(todo);
+
+        //Get current resource URL
+        //url
+       URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}").buildAndExpand(createdTodo.getId()).toUri();
+
+        return ResponseEntity.created(uri).build();
     }
 }
