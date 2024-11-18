@@ -1,4 +1,4 @@
-package com.example.restful_web_services.basic.auth;
+package com.example.basic.auth;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
