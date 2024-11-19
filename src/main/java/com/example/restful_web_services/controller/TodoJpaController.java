@@ -28,28 +28,46 @@ public class TodoJpaController {
             log.info("In method for getAllTodos. Username, {}", username);
             List<Todo> todos = toDoJpaRepository.findByUsername(username);
             if(todos.isEmpty()){
+                log.info("In method for getAllTodos. No data found.");
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
+            log.info("In method for getAllTodos. Todos found.");
             return new ResponseEntity<>(todos,HttpStatus.OK);
         } catch (Exception e) {
+            log.error(e.getMessage());
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @GetMapping("/jpa/users/{username}/todos/{id}")
     public ResponseEntity<Todo> getTodo(@PathVariable String username,@PathVariable long id){
-        Optional<Todo> todo = toDoJpaRepository.findByUsernameAndId(username, id);
 
-        return todo.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        try {
+            log.info("In getTodo method, Passed params: username, {}  id, {}", username, id);
+            Optional<Todo> todo = toDoJpaRepository.findByUsernameAndId(username, id);
+            if(todo.isPresent()){
+                log.info("Found data. (getTodo)");
+                return new ResponseEntity<>(todo.get(),HttpStatus.OK);
+            }else {
+                log.info("No data found. (getTodo)");
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new RuntimeException(e);
+        }
     }
 
     @DeleteMapping("/jpa/users/{username}/todos/{id}")
     public ResponseEntity<HttpStatus> deleteTodo(@PathVariable String username, @PathVariable long id) {
         try {
+            log.info("In method for deleteTodo. Username, {}, Id, {}", username, id);
             toDoJpaRepository.deleteBooksByUsernameAndId(username, id);
+            log.info("Data deleted.");
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (Exception e) {
+            log.info("Data not found. Data not deleted");
+            log.error(e.getMessage());
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
