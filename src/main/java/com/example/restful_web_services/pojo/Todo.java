@@ -36,4 +36,14 @@ public class Todo {
     }
 
 
+    @Override
+    public String toString() {
+        return "Todo{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", description='" + description + '\'' +
+                ", targetDate=" + targetDate +
+                ", isDone=" + isDone +
+                '}';
+    }
 }

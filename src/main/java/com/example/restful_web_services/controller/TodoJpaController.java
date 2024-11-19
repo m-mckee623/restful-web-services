@@ -2,7 +2,7 @@ package com.example.restful_web_services.controller;
 
 import com.example.restful_web_services.pojo.Todo;
 import com.example.restful_web_services.repository.ToDoJpaRepository;
-import com.example.restful_web_services.service.TodoHardcodedService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +16,7 @@ import java.util.Optional;
 
 @RestController
 @CrossOrigin(origins="http://localhost:4200")
+@Slf4j
 public class TodoJpaController {
 
     @Autowired
@@ -24,6 +25,7 @@ public class TodoJpaController {
     @GetMapping("/jpa/users/{username}/todos")
     public ResponseEntity<List<Todo>> getAllTodos(@PathVariable String username) {
         try{
+            log.info("In method for getAllTodos. Username, {}", username);
             List<Todo> todos = toDoJpaRepository.findByUsername(username);
             if(todos.isEmpty()){
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -58,11 +60,16 @@ public class TodoJpaController {
         Optional<Todo> todoData = toDoJpaRepository.findByUsernameAndId(username, id);
 
         try{
+            log.info("In method for updateTodo. Username, {}, id, {}", username, id);
+            log.info("Data being updated. Todo, {}", todo.toString());
             if(todoData.isPresent()){
+                log.info("Data successfully updated");
                 return new ResponseEntity<>(toDoJpaRepository.save(todo), HttpStatus.CREATED);
             } else
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                log.info("Data not found. Data not successfully updated");
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (Exception e) {
+            log.error(e.getMessage());
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
@@ -74,15 +81,18 @@ public class TodoJpaController {
             @PathVariable String username, @RequestBody Todo todo){
 
         try{
+            log.info("In method for createTodo. Username, {}, todo, {}", username, todo.toString());
             todo.setUsername(username);
-            Todo createdTodo = toDoJpaRepository.save(todo);
 
+            Todo createdTodo = toDoJpaRepository.save(todo);
+            log.info("Data successfully created");
             ///{id}
             URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
                     .path("/{id}").buildAndExpand(createdTodo.getId()).toUri();
 
             return ResponseEntity.created(uri).build();
         } catch (Exception e) {
+            log.error(e.getMessage());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
