@@ -7,12 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
-
-//TODO: ADD USERNAME AS PATH VARIABLE FOR THE NECESSARY CALLS. First get this all functioning basic.
+import java.util.Optional;
 
 @RestController
 @CrossOrigin(origins="http://localhost:4200")
@@ -22,45 +22,68 @@ public class TodoJpaController {
     private ToDoJpaRepository toDoJpaRepository;
 
     @GetMapping("/jpa/users/{username}/todos")
-    public List<Todo> getAllTodos(@PathVariable String username) {
-        return toDoJpaRepository.findByUsername(username);
+    public ResponseEntity<List<Todo>> getAllTodos(@PathVariable String username) {
+        try{
+            List<Todo> todos = toDoJpaRepository.findByUsername(username);
+            if(todos.isEmpty()){
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+            return new ResponseEntity<>(todos,HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping("/jpa/users/{username}/todos/{id}")
-    public Todo getTodo(@PathVariable String username,@PathVariable long id){
-        return toDoJpaRepository.findByUsernameAndId(username, id).get();
+    public ResponseEntity<Todo> getTodo(@PathVariable String username,@PathVariable long id){
+        Optional<Todo> todo = toDoJpaRepository.findByUsernameAndId(username, id);
+
+        return todo.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @DeleteMapping("/jpa/users/{username}/todos/{id}")
-    public ResponseEntity<Void> deleteTodo(@PathVariable String username, @PathVariable long id){
-
-         toDoJpaRepository.deleteBooksByTitle(username, id);
-
-         return ResponseEntity.noContent().build();    }
+    public ResponseEntity<HttpStatus> deleteTodo(@PathVariable String username, @PathVariable long id) {
+        try {
+            toDoJpaRepository.deleteBooksByUsernameAndId(username, id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
 
     //EDIT/UPDATE
     @PutMapping("/jpa/users/{username}/todos/{id}")
     public ResponseEntity<Todo> updateTodo(@PathVariable String username, @PathVariable long id, @RequestBody Todo todo){
-        toDoJpaRepository.save(todo);
+        Optional<Todo> todoData = toDoJpaRepository.findByUsernameAndId(username, id);
 
-        return new ResponseEntity<Todo>(todo, HttpStatus.OK);
+        try{
+            if(todoData.isPresent()){
+                return new ResponseEntity<>(toDoJpaRepository.save(todo), HttpStatus.CREATED);
+            } else
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
     }
 
     //CREATE/NEW
     @PostMapping("/jpa/users/{username}/todos")
-    public ResponseEntity<Void> createTodo(
+    public ResponseEntity<HttpStatus> createTodo(
             @PathVariable String username, @RequestBody Todo todo){
 
-        //Todo createdTodo = todoService.save(todo);
-        todo.setUsername(username);
-        Todo createdTodo = toDoJpaRepository.save(todo);
+        try{
+            todo.setUsername(username);
+            Todo createdTodo = toDoJpaRepository.save(todo);
 
-        //Location
-        //Get current resource url
-        ///{id}
-        URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}").buildAndExpand(createdTodo.getId()).toUri();
+            ///{id}
+            URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
+                    .path("/{id}").buildAndExpand(createdTodo.getId()).toUri();
 
-        return ResponseEntity.created(uri).build();
+            return ResponseEntity.created(uri).build();
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }
