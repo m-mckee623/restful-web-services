@@ -62,7 +62,7 @@ public class TodoJpaController {
     public ResponseEntity<HttpStatus> deleteTodo(@PathVariable String username, @PathVariable long id) {
         try {
             log.info("In method for deleteTodo. Username, {}, Id, {}", username, id);
-            toDoJpaRepository.deleteBooksByUsernameAndId(username, id);
+            toDoJpaRepository.deleteByUsernameAndId(username, id);
             log.info("Data deleted.");
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (Exception e) {
