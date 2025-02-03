@@ -15,28 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class HelloWorldController {
 
     //GET
-    //URI - /hello-world
-    //method - "Hello World". Will simply write a method to return a String
-    @GetMapping(path = "/hello-world")
-    public String helloWorld() {
-        return "Hello World";
-    }
-
-    //GET
-    //URI - /hello-world-pojo
-    //method - Will return the message input below
-    @GetMapping(path = "hello-world-pojo")
-    public HelloWorld helloWorldPojo() {
-        return new HelloWorld("Hello World, this is my message to the world!");
-        // Below was to show the error worked.
-       // throw new RuntimeException("Something went wrong");
-    }
-
-    //GET
-    //URI - /hello-world/path-variable/{name}
     //method - Will return the path variable in the message
-    @GetMapping(path = "hello-world/path-variable/{name}")
+    @GetMapping(path = "/welcome-message/{name}")
     public HelloWorld helloWorldPathVariable(@PathVariable String name) {
-        return new HelloWorld(String.format("Hello World, %s", name));
+        return new HelloWorld(String.format("Welcome, %s, start planning your day", name));
     }
 }

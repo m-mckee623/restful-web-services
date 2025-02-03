@@ -22,7 +22,7 @@ public class TodoJpaController {
     @Autowired
     private ToDoJpaRepository toDoJpaRepository;
 
-    @GetMapping("/jpa/users/{username}/todos")
+    @GetMapping("/users/{username}/todos")
     public ResponseEntity<List<Todo>> getAllTodos(@PathVariable String username) {
         try{
             log.info("In method for getAllTodos. Username, {}", username);
@@ -39,7 +39,7 @@ public class TodoJpaController {
         }
     }
 
-    @GetMapping("/jpa/users/{username}/todos/{id}")
+    @GetMapping("/users/{username}/todos/{id}")
     public ResponseEntity<Todo> getTodo(@PathVariable String username,@PathVariable long id){
 
         try {
@@ -58,7 +58,7 @@ public class TodoJpaController {
         }
     }
 
-    @DeleteMapping("/jpa/users/{username}/todos/{id}")
+    @DeleteMapping("/users/{username}/todos/{id}")
     public ResponseEntity<HttpStatus> deleteTodo(@PathVariable String username, @PathVariable long id) {
         try {
             log.info("In method for deleteTodo. Username, {}, Id, {}", username, id);
@@ -73,7 +73,7 @@ public class TodoJpaController {
     }
 
     //EDIT/UPDATE
-    @PutMapping("/jpa/users/{username}/todos/{id}")
+    @PutMapping("/users/{username}/todos/{id}")
     public ResponseEntity<Todo> updateTodo(@PathVariable String username, @PathVariable long id, @RequestBody Todo todo){
         Optional<Todo> todoData = toDoJpaRepository.findByUsernameAndId(username, id);
 
@@ -94,7 +94,7 @@ public class TodoJpaController {
     }
 
     //CREATE/NEW
-    @PostMapping("/jpa/users/{username}/todos")
+    @PostMapping("/users/{username}/todos")
     public ResponseEntity<HttpStatus> createTodo(
             @PathVariable String username, @RequestBody Todo todo){
 

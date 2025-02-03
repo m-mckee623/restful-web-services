@@ -43,12 +43,11 @@ public class JwtWebSecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        // https://github.com/spring-projects/spring-security/issues/1231
-        // https://docs.spring.io/spring-boot/docs/current/reference/html/data.html#data.sql.h2-web-console.spring-security
+
         return httpSecurity
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/authenticate", "/hello-world", "/hello-world-bean").permitAll()
-                        .requestMatchers(PathRequest.toH2Console()).permitAll() // h2-console is a servlet and NOT recommended for a production
+                        .requestMatchers("/authenticate").permitAll()
+                        .requestMatchers(PathRequest.toH2Console()).permitAll()
                         .requestMatchers(HttpMethod.OPTIONS,"/**")
                         .permitAll()
                         .anyRequest()
@@ -72,8 +71,8 @@ public class JwtWebSecurityConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        UserDetails user = User.withUsername("username")
-                .password("{noop}password")
+        UserDetails user = User.withUsername("Tom")
+                .password("{noop}password123")
                 .authorities("read")
                 .roles("USER")
                 .build();
