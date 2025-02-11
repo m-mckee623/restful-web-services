@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@CrossOrigin(origins="http://localhost:4200")
+@CrossOrigin(origins = "http://localhost:4200")
 @Slf4j
 public class TodoController {
 
@@ -29,7 +29,7 @@ public class TodoController {
             List<Todo> todos = toDoRepository.findByUsername(username);
             if(todos.isEmpty()){
                 log.info("In method for getAllTodos. No data found.");
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
             log.info("In method for getAllTodos. Todos found.");
             return new ResponseEntity<>(todos,HttpStatus.OK);

@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@CrossOrigin(origins="http://localhost:4200")
+@CrossOrigin(origins = "http://localhost:4200")
 public class UserController {
 
     @Autowired
@@ -56,5 +56,4 @@ public class UserController {
         response.put("message", "User registered successfully");
         return ResponseEntity.ok(response);
     }
-
 }
