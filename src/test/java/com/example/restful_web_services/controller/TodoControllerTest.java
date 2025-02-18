@@ -36,7 +36,7 @@ class TodoControllerTest {
     void testGetAllTodos() {
         String username = "testuser";
         List<Todo> todos = new ArrayList<>();
-        todos.add(new Todo(1L, "username", "Test Todo", new Date(), false));
+        todos.add(new Todo(1L, "username", "Test Todo", new Date(), false,""));
 
         when(toDoRepository.findByUsername(username)).thenReturn(todos);
 
@@ -50,7 +50,7 @@ class TodoControllerTest {
     void testGetTodo() {
         String username = "testuser";
         long id = 1L;
-        Todo todo = new Todo(id, username, "Test Todo",new Date(), false);
+        Todo todo = new Todo(id, username, "Test Todo",new Date(), false,"");
 
         when(toDoRepository.findByUsernameAndId(username, id)).thenReturn(Optional.of(todo));
 
@@ -76,7 +76,7 @@ class TodoControllerTest {
     void testUpdateTodo() {
         String username = "testuser";
         long id = 1L;
-        Todo todo = new Todo(id, username, "Updated Test Todo",new Date(), true);
+        Todo todo = new Todo(id, username, "Updated Test Todo",new Date(), true,"");
 
         when(toDoRepository.findByUsernameAndId(username, id)).thenReturn(Optional.of(todo));
         when(toDoRepository.save(todo)).thenReturn(todo);
@@ -90,7 +90,7 @@ class TodoControllerTest {
     @Test
     void testCreateTodo() {
         String username = "testuser";
-        Todo todo = new Todo(1L, username, "New Test Todo", new Date(), false);
+        Todo todo = new Todo(1L, username, "New Test Todo", new Date(), false,"");
 
         when(toDoRepository.save(any(Todo.class))).thenReturn(todo);
 

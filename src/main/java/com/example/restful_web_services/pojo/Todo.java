@@ -11,9 +11,13 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+//automatically generate getter methods for all the fields in a class.
 @Getter
+//automatically generate setter methods for all the fields in a class.
 @Setter
+//particular class is a JPA entity
 @Entity
+//TO-DO object.
 public class Todo {
     @Id
     @GeneratedValue
@@ -22,6 +26,7 @@ public class Todo {
     private String description;
     private Date targetDate;
     private boolean isDone;
+    private String status;
 
 
     @Override
@@ -32,6 +37,7 @@ public class Todo {
                 ", description='" + description + '\'' +
                 ", targetDate=" + targetDate +
                 ", isDone=" + isDone +
+                ", status='" + status + '\'' +
                 '}';
     }
 }

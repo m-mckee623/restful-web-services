@@ -22,6 +22,8 @@ public class TodoController {
     @Autowired
     private ToDoRepository toDoRepository;
 
+    //Step 5. The backend server processes the request and sends back a response.
+    //E.g. http://localhost:8080/users/leonardo/todos
     @GetMapping("/users/{username}/todos")
     public ResponseEntity<List<Todo>> getAllTodos(@PathVariable String username) {
         try{

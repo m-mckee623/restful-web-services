@@ -10,8 +10,10 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
+//Specify the name name as user_details, user was causing problem in H2 as by default that table exists.
 @Table(name = "user_details")
 public class User {
+    //Must have an ID for a Entity to use JPA
     @Id
     @GeneratedValue
     private Long id;
