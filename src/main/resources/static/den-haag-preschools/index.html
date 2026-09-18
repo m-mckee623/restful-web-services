@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>Den Haag Preschools &mdash; Research Map</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
+<style>
+  :root {
+    color-scheme: light dark;
+    --accent: #2563eb;
+    --bg: #ffffff;
+    --panel-bg: #f8fafc;
+    --text: #1e293b;
+    --muted: #64748b;
+    --border: #e2e8f0;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f172a;
+      --panel-bg: #1e293b;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --border: #334155;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+  }
+  header {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    background: var(--panel-bg);
+  }
+  header h1 { font-size: 1.05rem; margin: 0 0 2px; }
+  header p { font-size: 0.78rem; color: var(--muted); margin: 0; }
+
+  #controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 8px 14px;
+    background: var(--panel-bg);
+    border-bottom: 1px solid var(--border);
+    font-size: 0.85rem;
+  }
+  #controls label { display: flex; align-items: center; gap: 4px; }
+  #controls select, #controls input[type=range] { font-size: 0.85rem; }
+
+  #map { flex: 1; min-height: 0; width: 100%; }
+
+  .leaflet-popup-content h3 { margin: 0 0 4px; font-size: 0.95rem; }
+  .leaflet-popup-content .rating { color: #d97706; font-weight: 600; }
+  .leaflet-popup-content .research-block {
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px dashed #cbd5e1;
+    font-size: 0.78rem;
+    color: #64748b;
+  }
+
+  #about-toggle {
+    position: fixed;
+    bottom: 14px;
+    right: 14px;
+    z-index: 1000;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 999px;
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+  }
+  #about {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.55);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+  #about.open { display: flex; }
+  #about .card {
+    background: var(--bg);
+    color: var(--text);
+    max-width: 480px;
+    max-height: 80vh;
+    overflow-y: auto;
+    border-radius: 12px;
+    padding: 18px;
+    font-size: 0.85rem;
+    line-height: 1.4;
+  }
+  #about h2 { font-size: 1rem; margin-top: 0; }
+  #about button.close {
+    margin-top: 12px;
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--panel-bg);
+    color: var(--text);
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Den Haag Preschools &mdash; Research Map</h1>
+  <p>Childcare quality (ratings &amp; reviews) shown on the map. Diversity figures are an optional, separate research layer &mdash; see the info panel.</p>
+</header>
+
+<div id="controls">
+  <label>Neighbourhood
+    <select id="neighbourhood-filter">
+      <option value="">All</option>
+    </select>
+  </label>
+  <label>Min. rating: <span id="rating-value">0</span>&#9733;
+    <input type="range" id="rating-filter" min="0" max="5" step="0.5" value="0">
+  </label>
+  <label>
+    <input type="checkbox" id="diversity-toggle">
+    Show aggregate diversity research layer
+  </label>
+</div>
+
+<div id="map"></div>
+
+<button id="about-toggle" aria-label="About this map">i</button>
+<div id="about">
+  <div class="card">
+    <h2>About this map</h2>
+    <p><strong>Purpose:</strong> this is a research/reporting tool. It maps childcare quality (star rating and number of reviews) for preschools in Den Haag, and separately, as an opt-in layer, an aggregate neighbourhood-level diversity statistic intended for studying segregation trends in childcare, not for choosing a school by ethnic composition.</p>
+    <p><strong>Data:</strong> the locations, ratings and diversity figures currently loaded are <strong>illustrative sample data</strong>, not real institutions. For a production version, source real locations from the official <a href="https://www.landelijkregisterkinderopvang.nl/" target="_blank" rel="noopener">LRK (Landelijk Register Kinderopvang)</a>, and aggregate statistics from <a href="https://www.denhaag.nl/nl/opendata" target="_blank" rel="noopener">Gemeente Den Haag open data</a> or <a href="https://opendata.cbs.nl/" target="_blank" rel="noopener">CBS StatLine</a>. Never source or publish per-child ethnicity data; only use officially published, aggregated, school- or neighbourhood-level figures.</p>
+    <p><strong>Responsible use:</strong> the diversity layer is deliberately not combined into any "best school" ranking and cannot be used to sort or filter results. Please don't repurpose this data to steer enrolment decisions by ethnic composition.</p>
+    <button class="close" onclick="document.getElementById('about').classList.remove('open')">Close</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+(function () {
+  var map = L.map('map', { zoomControl: true }).setView([52.0745, 4.3050], 12);
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  }).addTo(map);
+
+  var markersLayer = L.layerGroup().addTo(map);
+  var allPreschools = [];
+
+  var neighbourhoodSelect = document.getElementById('neighbourhood-filter');
+  var ratingFilter = document.getElementById('rating-filter');
+  var ratingValueLabel = document.getElementById('rating-value');
+  var diversityToggle = document.getElementById('diversity-toggle');
+
+  function starString(rating) {
+    var full = Math.round(rating);
+    return '★'.repeat(full) + '☆'.repeat(5 - full);
+  }
+
+  function popupHtml(p) {
+    var html = '<h3>' + p.name + '</h3>' +
+      '<div>' + p.neighbourhood + ' &middot; ' + p.address + '</div>' +
+      '<div class="rating">' + starString(p.rating) + ' ' + p.rating.toFixed(1) + ' (' + p.reviewCount + ' reviews)</div>' +
+      '<div>Age range: ' + (p.ageRange || 'n/a') + '</div>';
+
+    if (diversityToggle.checked && p.diversityIndexPercent != null) {
+      html += '<div class="research-block">Research data: aggregate diversity index ' +
+        p.diversityIndexPercent.toFixed(1) + '% (' + (p.diversitySourceYear || 'year unknown') +
+        '). Aggregate/school-level figure, for research use only.</div>';
+    }
+    return html;
+  }
+
+  function render() {
+    markersLayer.clearLayers();
+    var neighbourhood = neighbourhoodSelect.value;
+    var minRating = parseFloat(ratingFilter.value);
+
+    allPreschools
+      .filter(function (p) {
+        return (!neighbourhood || p.neighbourhood === neighbourhood) && p.rating >= minRating;
+      })
+      .forEach(function (p) {
+        L.marker([p.latitude, p.longitude])
+          .bindPopup(popupHtml(p))
+          .addTo(markersLayer);
+      });
+  }
+
+  function populateNeighbourhoods(preschools) {
+    var names = Array.from(new Set(preschools.map(function (p) { return p.neighbourhood; }))).sort();
+    names.forEach(function (n) {
+      var opt = document.createElement('option');
+      opt.value = n;
+      opt.textContent = n;
+      neighbourhoodSelect.appendChild(opt);
+    });
+  }
+
+  fetch('/api/den-haag/preschools')
+    .then(function (res) {
+      if (!res.ok) { throw new Error('Request failed: ' + res.status); }
+      return res.json();
+    })
+    .then(function (data) {
+      allPreschools = data;
+      populateNeighbourhoods(data);
+      render();
+    })
+    .catch(function (err) {
+      console.error(err);
+      document.getElementById('map').insertAdjacentHTML(
+        'afterbegin',
+        '<div style="padding:16px;">Could not load preschool data. Is the backend running?</div>'
+      );
+    });
+
+  neighbourhoodSelect.addEventListener('change', render);
+  ratingFilter.addEventListener('input', function () {
+    ratingValueLabel.textContent = ratingFilter.value;
+    render();
+  });
+  diversityToggle.addEventListener('change', render);
+
+  document.getElementById('about-toggle').addEventListener('click', function () {
+    document.getElementById('about').classList.add('open');
+  });
+  document.getElementById('about').addEventListener('click', function (e) {
+    if (e.target.id === 'about') { document.getElementById('about').classList.remove('open'); }
+  });
+})();
+</script>
+</body>
+</html>

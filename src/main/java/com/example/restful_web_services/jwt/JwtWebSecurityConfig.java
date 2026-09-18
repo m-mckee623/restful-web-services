@@ -51,6 +51,8 @@ public class JwtWebSecurityConfig {
                         .requestMatchers(PathRequest.toH2Console()).permitAll() // h2-console is a servlet and NOT recommended for a production
                         .requestMatchers(HttpMethod.OPTIONS,"/**")
                         .permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/den-haag/preschools/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/den-haag-preschools/**", "/den-haag-preschools").permitAll()
                         .anyRequest()
                         .authenticated())
                 .csrf(AbstractHttpConfigurer::disable)
