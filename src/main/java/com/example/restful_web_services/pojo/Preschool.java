@@ -15,6 +15,10 @@ import lombok.*;
  * combine the two into a single "best" score, since ranking schools by ethnic
  * composition facilitates segregation in school choice. Treat this field as
  * research/reporting data only, not a selection criterion.
+ *
+ * internationalProgram/languages describe the medium of instruction and curriculum
+ * on offer (e.g. bilingual Dutch/English, IB). This is an ordinary, non-discriminatory
+ * school-choice factor and is fine to filter/sort on, unlike diversityIndexPercent above.
  */
 @Data
 @NoArgsConstructor
@@ -47,6 +51,15 @@ public class Preschool {
 
     /** Year the diversityIndexPercent figure was published. Nullable. */
     private Integer diversitySourceYear;
+
+    /** Indicative childcare price in EUR per hour. */
+    private Double pricePerHourEuro;
+
+    /** Whether the location offers a bilingual/international programme (medium of instruction, curriculum). */
+    private boolean internationalProgram;
+
+    /** Languages of instruction, e.g. "Dutch" or "Dutch, English". */
+    private String languages;
 
     @Override
     public String toString() {

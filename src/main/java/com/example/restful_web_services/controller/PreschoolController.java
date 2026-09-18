@@ -36,7 +36,8 @@ public class PreschoolController {
     @GetMapping
     public ResponseEntity<List<Preschool>> getAllPreschools(
             @RequestParam(required = false) String neighbourhood,
-            @RequestParam(required = false) Double minRating) {
+            @RequestParam(required = false) Double minRating,
+            @RequestParam(required = false) Boolean internationalOnly) {
 
         List<Preschool> preschools;
         if (neighbourhood != null && minRating != null) {
@@ -49,7 +50,11 @@ public class PreschoolController {
             preschools = preschoolRepository.findAll();
         }
 
-        log.info("Returning {} preschools (neighbourhood={}, minRating={})", preschools.size(), neighbourhood, minRating);
+        if (Boolean.TRUE.equals(internationalOnly)) {
+            preschools = preschools.stream().filter(Preschool::isInternationalProgram).collect(Collectors.toList());
+        }
+
+        log.info("Returning {} preschools (neighbourhood={}, minRating={}, internationalOnly={})", preschools.size(), neighbourhood, minRating, internationalOnly);
         return new ResponseEntity<>(preschools, HttpStatus.OK);
     }
 
@@ -82,12 +87,18 @@ public class PreschoolController {
                             .mapToDouble(Preschool::getDiversityIndexPercent)
                             .average()
                             .orElse(Double.NaN);
+                    double avgPrice = group.stream()
+                            .filter(p -> p.getPricePerHourEuro() != null)
+                            .mapToDouble(Preschool::getPricePerHourEuro)
+                            .average()
+                            .orElse(Double.NaN);
 
                     Map<String, Object> row = new LinkedHashMap<>();
                     row.put("neighbourhood", entry.getKey());
                     row.put("preschoolCount", group.size());
                     row.put("averageRating", Math.round(avgRating * 10.0) / 10.0);
                     row.put("averageDiversityIndexPercent", Double.isNaN(avgDiversity) ? null : Math.round(avgDiversity * 10.0) / 10.0);
+                    row.put("averagePricePerHourEuro", Double.isNaN(avgPrice) ? null : Math.round(avgPrice * 100.0) / 100.0);
                     return row;
                 })
                 .sorted(Comparator.comparing(m -> (String) m.get("neighbourhood")))

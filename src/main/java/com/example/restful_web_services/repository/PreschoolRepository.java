@@ -14,4 +14,6 @@ public interface PreschoolRepository extends JpaRepository<Preschool, Long> {
     List<Preschool> findByRatingGreaterThanEqual(double minRating);
 
     List<Preschool> findByNeighbourhoodIgnoreCaseAndRatingGreaterThanEqual(String neighbourhood, double minRating);
+
+    List<Preschool> findByInternationalProgramTrue();
 }
